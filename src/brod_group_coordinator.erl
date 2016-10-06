@@ -398,7 +398,7 @@ discover_coordinator(#state{ client      = Client
       _ = brod_sock:stop(SockPid),
       ClientId = make_group_connection_client_id(),
       NewSockPid =
-        ?ESCALATE(brod_sock:start_link(self(), Host, Port, ClientId, [])),
+        ?ESCALATE(brod_sock:start_link(self(), Host, Port, ClientId, brod_client:get_config(Client))),
       log(State, info, "connected to group coordinator ~s:~p",
           [Host, Port]),
       NewState =

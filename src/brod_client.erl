@@ -23,7 +23,8 @@
 -module(brod_client).
 -behaviour(gen_server).
 
--export([ get_connection/3
+-export([ get_config/1
+        , get_connection/3
         , get_consumer/3
         , get_group_coordinator/2
         , get_leader_connection/3
@@ -270,6 +271,11 @@ register_consumer(Client, Topic, Partition) ->
 get_connection(Client, Host, Port) ->
   safe_gen_call(Client, {get_connection, Host, Port}, infinity).
 
+%% @doc Retrieves the configuration for a given client
+-spec get_config(client()) -> client_config().
+get_config(Client) ->
+  safe_gen_call(Client, get_config, infinity).
+
 %%%_* gen_server callbacks =====================================================
 
 init({BootstrapEndpoints, ClientId, Config}) ->
@@ -387,6 +393,8 @@ handle_call({get_metadata, Topic}, _From, State) ->
 handle_call({get_connection, Host, Port}, _From, State) ->
   {NewState, Result} = do_get_connection(State, Host, Port),
   {reply, Result, NewState};
+handle_call(get_config, _From, State) ->
+  {reply, State#state.config, State};
 handle_call(stop, _From, State) ->
   {stop, normal, ok, State};
 handle_call(Call, _From, State) ->
